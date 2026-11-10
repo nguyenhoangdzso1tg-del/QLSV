@@ -1,0 +1,38 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "violations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "coso", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "violations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "coso", "order": "ASCENDING" },
+        { "fieldPath": "ngay", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "diemdanh",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "coso", "order": "ASCENDING" },
+        { "fieldPath": "ngay", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "diemdanh",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "coso", "order": "ASCENDING" },
+        { "fieldPath": "ngay", "order": "ASCENDING" },
+        { "fieldPath": "lop", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

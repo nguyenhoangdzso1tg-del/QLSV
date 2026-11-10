@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hồ sơ cá nhân</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="theme.css">
+<script src="theme-init.js"></script>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(37, 99, 235, 0.18) 0%, transparent 38%),
+      radial-gradient(circle at 90% 92%, rgba(139, 92, 246, 0.16) 0%, transparent 42%),
+      var(--theme-bg, #f3f4f6);
+    color: var(--theme-text, #111827);
+    padding: 22px 16px 48px;
+  }
+
+  .profile-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .back, .top-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 9px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--theme-card, #fff);
+    border: 1px solid var(--theme-border, #e5e7eb);
+    color: var(--theme-text, #111827);
+    transition: transform .15s ease, background .15s ease;
+  }
+
+  .back:hover, .top-link:hover {
+    transform: translateY(-1px);
+    background: #eff6ff;
+  }
+
+  html[data-theme="dark"] .back:hover,
+  html[data-theme="dark"] .top-link:hover {
+    background: #16243a;
+  }
+
+  .profile-card {
+    background: var(--theme-card, #fff);
+    border: 1px solid var(--theme-border, #e5e7eb);
+    border-radius: 18px;
+    box-shadow: 0 16px 46px rgba(15, 23, 42, 0.10);
+    padding: 24px 22px 22px;
+  }
+
+  html[data-theme="dark"] .profile-card {
+    box-shadow: 0 16px 46px rgba(0, 0, 0, 0.4);
+  }
+
+  /* ---------- Avatar ---------- */
+  .avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--theme-border, #e5e7eb);
+  }
+
+  .avatar-wrap {
+    width: 104px;
+    height: 104px;
+    border-radius: 9999px;
+    padding: 3px;
+    background: linear-gradient(135deg, #2563eb, #8b5cf6);
+    flex-shrink: 0;
+  }
+
+  .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    object-fit: cover;
+    border: 3px solid var(--theme-card, #fff);
+    background: #e2e8f0;
+  }
+
+  .avatar-info {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .avatar-info h1 {
+    margin: 0 0 4px;
+    font-size: 21px;
+    line-height: 1.3;
+  }
+
+  .avatar-info .email {
+    margin: 0 0 10px;
+    color: var(--theme-muted, #64748b);
+    font-size: 13px;
+    word-break: break-all;
+  }
+
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 12px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .badge.role { background: #e0e7ff; color: #3730a3; }
+  .badge.role.manager { background: #fef3c7; color: #92400e; }
+  .badge.role.user { background: #e2e8f0; color: #334155; }
+  .badge.status-ok { background: #dcfce7; color: #166534; }
+
+  html[data-theme="dark"] .badge.role { background: #1e1b4b; color: #c7d2fe; }
+  html[data-theme="dark"] .badge.role.manager { background: #3a2a0d; color: #fcd34d; }
+  html[data-theme="dark"] .badge.role.user { background: #1c2a40; color: #cbd5e1; }
+  html[data-theme="dark"] .badge.status-ok { background: #10231a; color: #86efac; }
+
+  .avatar-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn-sm {
+    border: 1px solid var(--theme-border, #e5e7eb);
+    background: var(--theme-card, #fff);
+    color: var(--theme-text, #111827);
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s ease, transform .15s ease;
+  }
+
+  .btn-sm:hover { background: #eff6ff; transform: translateY(-1px); }
+
+  html[data-theme="dark"] .btn-sm:hover { background: #16243a; }
+
+  /* ---------- Form ---------- */
+  .section {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--theme-border, #e5e7eb);
+  }
+
+  .section:last-of-type { border-bottom: none; }
+
+  .section h2 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--theme-muted, #64748b);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 11px 13px;
+    border-radius: 9px;
+    border: 1px solid var(--theme-border, #e5e7eb);
+    background: var(--theme-input, #f8fafc);
+    color: var(--theme-text, #111827);
+    font-size: 15px;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .field input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+  }
+
+  .field input[readonly] {
+    opacity: .75;
+    cursor: not-allowed;
+  }
+
+  .field .hint {
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--theme-muted, #64748b);
+  }
+
+  /* ---------- Chọn theme ---------- */
+  .theme-picker {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .theme-choice {
+    flex: 1;
+    min-width: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 13px 14px;
+    border-radius: 11px;
+    border: 1.5px solid var(--theme-border, #e5e7eb);
+    background: var(--theme-input, #f8fafc);
+    color: var(--theme-text, #111827);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .18s ease;
+  }
+
+  .theme-choice:hover { border-color: #93c5fd; }
+
+  .theme-choice.active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #1d4ed8;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  html[data-theme="dark"] .theme-choice.active {
+    background: #172554;
+    color: #93c5fd;
+    border-color: #3b82f6;
+  }
+
+  /* ---------- Nút chính ---------- */
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .actions button {
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform .15s ease, background .15s ease;
+  }
+
+  .actions .primary {
+    flex: 1;
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+  }
+
+  .actions .primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+  .actions .primary:disabled { background: #94a3b8; cursor: wait; box-shadow: none; }
+
+  .actions .danger {
+    background: #fff1f2;
+    border: 1.5px solid #fecdd3;
+    color: #be123c;
+  }
+
+  .actions .danger:hover { background: #ffe4e6; }
+
+  html[data-theme="dark"] .actions .danger {
+    background: #2a1418;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+  }
+
+  .msg {
+    margin-top: 14px;
+    font-size: 13.5px;
+    border-radius: 10px;
+    padding: 0;
+    line-height: 1.5;
+  }
+
+  .msg.ok {
+    padding: 10px 12px;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+
+  .msg.err {
+    padding: 10px 12px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+
+  html[data-theme="dark"] .msg.ok { background: #10231a; color: #86efac; border-color: #166534; }
+  html[data-theme="dark"] .msg.err { background: #2a1418; color: #fca5a5; border-color: #7f1d1d; }
+
+  /* ---------- Khối quản trị ---------- */
+  .admin-box {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px dashed var(--theme-border, #e5e7eb);
+    background: var(--theme-input, #f8fafc);
+  }
+
+  .admin-box h3 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--theme-muted, #64748b);
+  }
+
+  .admin-links {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .admin-links a {
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+    padding: 10px 12px;
+    border-radius: 9px;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fff;
+    background: #4f46e5;
+  }
+
+  .admin-links a:hover { background: #4338ca; }
+  .admin-links a.green { background: #059669; }
+  .admin-links a.green:hover { background: #047857; }
+
+  @media (max-width: 520px) {
+    .avatar-row { gap: 14px; }
+    .avatar-wrap { width: 86px; height: 86px; }
+    .avatar-info h1 { font-size: 18px; }
+    .actions { flex-direction: column; }
+    .actions .danger { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="profile-wrap">
+
+  <div class="topbar">
+    <a href="index.html" class="back">
+      <i class="fa-solid fa-arrow-left"></i> Về trang chính
+    </a>
+    <a href="admin.html" class="top-link" id="adminLink" style="display:none;">
+      <i class="fa-solid fa-users-gear"></i> Quản trị người dùng
+    </a>
+  </div>
+
+  <div class="profile-card">
+
+    <div class="avatar-row">
+      <div class="avatar-wrap">
+        <img id="avatarImg" alt="Avatar">
+      </div>
+      <div class="avatar-info">
+        <h1 id="profileName">…</h1>
+        <p class="email" id="profileEmail">…</p>
+        <div class="badges">
+          <span class="badge role" id="roleBadge">…</span>
+          <span class="badge status-ok" id="statusBadge">
+            <i class="fa-solid fa-circle-check"></i> Đã duyệt
+          </span>
+        </div>
+        <div class="avatar-actions">
+          <input type="file" id="avatarInput" accept="image/*" hidden>
+          <button type="button" class="btn-sm" id="changeAvatarBtn">
+            <i class="fa-solid fa-camera"></i> Đổi ảnh
+          </button>
+          <button type="button" class="btn-sm" id="removeAvatarBtn">
+            <i class="fa-solid fa-trash-can"></i> Xoá ảnh
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><i class="fa-solid fa-id-card" style="color:#2563eb;margin-right:6px;"></i>Thông tin tài khoản</h2>
+
+      <div class="field">
+        <label for="displayName">Tên hiển thị</label>
+        <input id="displayName" maxlength="60" placeholder="Nhập tên của bạn">
+        <div class="hint">Tên này sẽ hiện ở cột “Người nhập” khi bạn ghi dữ liệu.</div>
+      </div>
+
+      <div class="field">
+        <label for="coso">Cơ sở</label>
+        <input id="coso" readonly>
+        <div class="hint">Cơ sở do admin gán. Bạn không tự đổi được.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><i class="fa-solid fa-palette" style="color:#7c3aed;margin-right:6px;"></i>Giao diện</h2>
+      <div class="theme-picker">
+        <button type="button" class="theme-choice" data-theme-choice="light">
+          <i class="fa-solid fa-sun"></i> Sáng
+        </button>
+        <button type="button" class="theme-choice" data-theme-choice="dark">
+          <i class="fa-solid fa-moon"></i> Tối
+        </button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="primary" id="saveBtn">
+        <i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi
+      </button>
+      <button type="button" class="danger" id="logoutBtn">
+        <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+      </button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="admin-box" id="adminBox" style="display:none;">
+      <h3>Khu vực quản trị</h3>
+      <div class="admin-links">
+        <a href="admin.html" id="adminUsersLink">
+          <i class="fa-solid fa-users-gear"></i> Duyệt người dùng
+        </a>
+        <a href="quanly-sv.html" class="green" id="adminStudentsLink">
+          <i class="fa-solid fa-user-graduate"></i> Quản lí sinh viên
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module" src="profile.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(function () {});
+}
+</script>
+</body>
+</html>

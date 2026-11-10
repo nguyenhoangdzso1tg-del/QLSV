@@ -1,0 +1,119 @@
+rules_version = '2';
+
+/* =========================================================
+   FIRESTORE SECURITY RULES — Hệ thống quản lý vi phạm
+   Dán toàn bộ file này vào:
+   Firebase Console → Firestore Database → Rules → Publish
+   ========================================================= */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ---------- Hàm dùng chung ---------- */
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isApproved() {
+      return signedIn()
+        && userData().approved == true
+        && userData().rejected != true;
+    }
+
+    function myRole() {
+      return userData().role;
+    }
+
+    function isAdmin() {
+      return isApproved() && myRole() == 'admin';
+    }
+
+    function isManager() {
+      return isApproved() && (myRole() == 'admin' || myRole() == 'manager');
+    }
+
+    function myCoso() {
+      return userData().coso;
+    }
+
+    /* ---------- Hồ sơ người dùng ---------- */
+    match /users/{uid} {
+
+      function isSelf() {
+        return signedIn() && request.auth.uid == uid;
+      }
+
+      // Ai cũng đọc được hồ sơ của mình; admin đọc được tất cả
+      allow read: if isSelf() || isAdmin();
+
+      // Tự tạo hồ sơ khi đăng nhập lần đầu — không thể tự nâng quyền
+      allow create: if isSelf()
+        && request.resource.data.role == 'user'
+        && request.resource.data.approved == false
+        && request.resource.data.rejected == false
+        && request.resource.data.coso == '';
+
+      // Admin sửa mọi trường (duyệt, vai trò, cơ sở...).
+      // Người dùng chỉ sửa được tên / avatar / giao diện của chính mình.
+      allow update: if isAdmin()
+        || (isSelf()
+            && request.resource.data.role == resource.data.role
+            && request.resource.data.approved == resource.data.approved
+            && request.resource.data.rejected == resource.data.rejected
+            && request.resource.data.coso == resource.data.coso
+            && request.resource.data.email == resource.data.email
+            && request.resource.data.createdAt == resource.data.createdAt);
+
+      allow delete: if isAdmin();
+    }
+
+    /* ---------- Siêu dữ liệu (cây Khoa → Khóa → Lớp) ---------- */
+    // Chỉ đọc 1 document nhỏ thay vì quét toàn bộ collection students.
+    match /meta/{id} {
+      allow read: if isApproved();
+      allow write: if isManager();
+    }
+
+    /* ---------- Danh sách sinh viên ---------- */
+    match /students/{id} {
+      allow read: if isApproved();
+      allow write: if isManager();
+    }
+
+    /* ---------- Vi phạm ---------- */
+    match /violations/{id} {
+      allow read: if isApproved()
+        && (isAdmin() || resource.data.coso == myCoso());
+
+      allow create: if isApproved()
+        && (isAdmin() || request.resource.data.coso == myCoso());
+
+      allow update, delete: if isManager()
+        && (isAdmin() || resource.data.coso == myCoso());
+    }
+
+    /* ---------- Điểm danh ---------- */
+    // Lưu ý: khi "Gửi điểm danh", app THAY THẾ dữ liệu cũ của cùng lớp + ngày
+    // (xoá bản ghi cũ rồi ghi lại), nên người dùng đã duyệt trong cùng cơ sở
+    // cũng cần quyền update/delete ở đây. Nút xoá trên trang danh sách vẫn chỉ
+    // hiện với admin/quản lí (kiểm soát ở giao diện).
+    match /diemdanh/{id} {
+      allow read: if isApproved()
+        && (isAdmin() || resource.data.coso == myCoso());
+
+      allow create: if isApproved()
+        && (isAdmin() || request.resource.data.coso == myCoso());
+
+      allow update, delete: if isApproved()
+        && (isAdmin() || resource.data.coso == myCoso());
+    }
+
+    /* ---------- Chặn mọi truy cập khác ---------- */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

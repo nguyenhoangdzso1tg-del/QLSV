@@ -1,0 +1,1192 @@
+/* ===== GLOBAL ===== */
+:root {
+  --primary: #2055ac;          /* xám đậm */
+  --primary-dark: #0d366f;     /* đen xám */
+  --primary-light: #253d5e;
+  --bg: #f3f4f6;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --success: #059669;
+  --danger: #dc2626;
+  --warning: #d97706;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===== NÚT QUAY LẠI ===== */
+.btn,
+.btn-base,
+.btn-export,
+.filter-btn,
+.btn-add-dd,
+.btn-delete,
+.btn-trash,
+.btn-confirm-delete,
+.btn-cancel-select,
+.google-btn,
+.ai-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  padding: 10px 18px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease, opacity 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 6px 14px rgba(15, 23, 42, 0.12);
+}
+
+.btn {
+  margin-top: 8px;
+  margin-bottom: 12px;
+  background: var(--primary);
+  color: #fff;
+}
+.btn:hover {
+  background: #275596;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 10px 18px rgba(37, 99, 235, 0.2);
+}
+
+/* ===== NÚT SIDEBAR ===== */
+.btn-base {
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 10px;
+  font-size: 15px;
+  text-align: center;
+  border-color: rgba(255, 255, 255, 0.75);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-base:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 10px 18px rgba(15, 23, 42, 0.18);
+}
+
+.btn-base:active {
+  transform: translateY(0);
+}
+
+/* ===== NÚT SIDEBAR – TRẺ TRUNG, 4 nút khác màu chủ đạo ===== */
+.btn-back,
+.btn-send,
+.btn-yellow,
+.btn-calendar,
+.btn-stage {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.82) !important;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+/* Quay lại – xanh dương (giữ màu chủ đạo) */
+.btn-back {
+  background: #2563eb !important;
+}
+.btn-back:hover {
+  background: #1d4ed8 !important;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 10px 22px rgba(37, 99, 235, 0.22);
+}
+
+/* Gửi – xanh lá (giữ màu chủ đạo) */
+.btn-send {
+  background: #16a34a !important;
+}
+.btn-send:hover {
+  background: #15803d !important;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 10px 22px rgba(22, 163, 74, 0.22);
+}
+
+/* Danh sách vi phạm – đỏ */
+.btn-yellow{
+  background: #ea3333 !important;
+  color: #ffffff !important;
+}
+.btn-yellow:hover{
+  background: #a31c1c !important;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 10px 22px rgba(234, 51, 51, 0.22);
+}
+
+/* Lịch vi phạm – cam */
+.btn-calendar {
+  background: #ea0cab !important;
+  color: #ffffff !important;
+}
+.btn-calendar:hover {
+  background: #a9167a !important;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 10px 22px rgba(234, 12, 171, 0.22);
+}
+
+/* Gửi vào danh sách (chờ gửi) – xanh ngọc */
+.btn-stage {
+  background: #0891b2 !important;
+}
+.btn-stage:hover {
+  background: #0e7490 !important;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 10px 22px rgba(8, 145, 178, 0.22);
+}
+.btn-export {
+  margin-top: 12px;
+  background: #379352;
+  color: #fff;
+  border: 1px solid rgba(22, 101, 52, 0.15);
+  box-shadow: 0 8px 18px rgba(55, 147, 82, 0.18);
+}
+.btn-export:hover {
+  background: #1b6132;
+  transform: translateY(-1px);
+}
+.btn-export.orange {
+  background: var(--warning);
+  border-color: rgba(146, 64, 14, 0.12);
+  box-shadow: 0 8px 18px rgba(217, 119, 6, 0.2);
+}
+.btn-export.orange:hover {
+  background: #b45309;
+}
+.btn-export.gray {
+  background: #64748b;
+  border-color: rgba(51, 65, 85, 0.15);
+  box-shadow: 0 8px 18px rgba(100, 116, 139, 0.18);
+}
+.btn-export.gray:hover {
+  background: #475569;
+}
+
+.filter-btn {
+  background: var(--primary);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 18px rgba(37, 99, 235, 0.18);
+}
+.filter-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.95);
+}
+.filter-btn.gray {
+  background: #64748b;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 18px rgba(100, 116, 139, 0.18);
+}
+.filter-btn.gray:hover {
+  background: #475569;
+}
+
+.export-wrapper {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* ===== SIDEBAR TITLE ===== */
+.title {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 14px 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 8px;
+}
+
+/* ===== CALENDAR PAGE LAYOUT (TRÊN - DƯỚI) ===== */
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 20px 24px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Lịch nằm trên, căn giữa, gọn */
+.calendar-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+/* Dòng cơ sở trên đầu lịch */
+.coso-line {
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(135deg, #1e3a8a, #312e81);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+/* Nút chọn cả tháng / bỏ chọn */
+.month-select-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 12px;
+  align-items: stretch;
+}
+.month-select-bar .btn-export {
+  margin-top: 0;
+  flex: 1;
+  justify-content: center;
+}
+@media (max-width: 768px) {
+  .month-select-bar {
+    max-width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .month-select-bar .btn-export {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0;
+  }
+}
+
+#calendar {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+  padding: 16px 18px 20px;
+  border: 1px solid var(--border);
+}
+
+#calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+#calendar-header button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: #3d76c7;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+#calendar-header button:hover {
+  background: var(--primary-dark);
+}
+#calendar-header span {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+/* Bảng lịch gọn đẹp */
+table.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+table.calendar-table th {
+  background: #eff6ff;
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 4px;
+  border: 1px solid #dbeafe;
+}
+table.calendar-table td {
+  border: 1px solid var(--border);
+  height: 48px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.15s;
+  position: relative;
+  padding: 0;
+}
+table.calendar-table td:hover:not(.inactive) {
+  background: #dbeafe;
+}
+table.calendar-table td.inactive {
+  background: #f8fafc;
+  color: #cbd5e1;
+  cursor: default;
+}
+table.calendar-table td.active {
+  background: var(--primary) !important;
+  color: white !important;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 2px var(--primary-dark);
+}
+
+/* Phần chi tiết / bảng phía dưới */
+#details {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px 24px 28px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+}
+#details h3 {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 1.15rem;
+}
+#selectedDaysLabel {
+  margin-bottom: 10px;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 14px;
+}
+#totalCount {
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 12px;
+}
+
+/* Bảng vi phạm */
+.violation-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 12.5px;
+  background: white;
+  border-radius: 12px;
+  overflow: clip;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.violation-table thead {
+  background: var(--primary);
+  color: white;
+}
+/* Header dính phía trên khi cuộn (cả bảng chi tiết + bảng gộp) */
+.violation-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--primary);
+  box-shadow: inset 0 -2px 0 rgba(255,255,255,0.25), 0 2px 6px rgba(0,0,0,0.12);
+}
+#mergeTable thead th {
+  background: #d97706;
+}
+.violation-table thead th:first-child {
+  border-top-left-radius: 12px;
+}
+.violation-table thead th:last-child {
+  border-top-right-radius: 12px;
+}
+.violation-table th,
+.violation-table td {
+  padding: 8px 5px;
+  box-sizing: border-box;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.violation-table th {
+  font-size: 12px;
+  font-weight: 600;
+}
+/* Độ rộng cột — cân đối vừa khung, không tràn sang phải */
+.violation-table th:nth-child(1),
+.violation-table td:nth-child(1) { width: 38px; }   /* STT */
+.violation-table th:nth-child(2),
+.violation-table td:nth-child(2) { width: 86px; }   /* Mã SV */
+.violation-table th:nth-child(3),
+.violation-table td:nth-child(3) { width: 106px; }  /* Tên */
+.violation-table th:nth-child(4),
+.violation-table td:nth-child(4) { width: 108px; }  /* Lớp */
+.violation-table th:nth-child(5),
+.violation-table td:nth-child(5) { width: 44px; }   /* Khoá */
+.violation-table th:nth-child(6),
+.violation-table td:nth-child(6) { width: 90px; }   /* Khoa */
+
+/* Bảng chi tiết (có cột Ngày) */
+#violationTable th:nth-child(7),  #violationTable td:nth-child(7)  { width: 74px; } /* Ngày */
+#violationTable th:nth-child(8),  #violationTable td:nth-child(8)  { width: 48px; } /* Mang dép */
+#violationTable th:nth-child(9),  #violationTable td:nth-child(9)  { width: 46px; } /* Đi trễ */
+#violationTable th:nth-child(10), #violationTable td:nth-child(10) { width: 50px; } /* Hút thuốc */
+#violationTable th:nth-child(11), #violationTable td:nth-child(11) { width: 56px; } /* Sai đồng phục */
+#violationTable th:nth-child(12), #violationTable td:nth-child(12) { width: 56px; } /* Không thẻ SV */
+#violationTable th:nth-child(13), #violationTable td:nth-child(13) { width: 54px; } /* Vắng có phép */
+#violationTable th:nth-child(14), #violationTable td:nth-child(14) { width: 60px; } /* Vắng không phép */
+#violationTable th:nth-child(15), #violationTable td:nth-child(15) { width: 56px; } /* Vắng chào cờ */
+
+/* Bảng gộp (không có cột Ngày) */
+#mergeTable th:nth-child(7),  #mergeTable td:nth-child(7)  { width: 48px; } /* Mang dép */
+#mergeTable th:nth-child(8),  #mergeTable td:nth-child(8)  { width: 46px; } /* Đi trễ */
+#mergeTable th:nth-child(9),  #mergeTable td:nth-child(9)  { width: 50px; } /* Hút thuốc */
+#mergeTable th:nth-child(10), #mergeTable td:nth-child(10) { width: 56px; } /* Sai đồng phục */
+#mergeTable th:nth-child(11), #mergeTable td:nth-child(11) { width: 56px; } /* Không thẻ SV */
+#mergeTable th:nth-child(12), #mergeTable td:nth-child(12) { width: 54px; } /* Vắng có phép */
+#mergeTable th:nth-child(13), #mergeTable td:nth-child(13) { width: 60px; } /* Vắng không phép */
+#mergeTable th:nth-child(14), #mergeTable td:nth-child(14) { width: 56px; } /* Vắng chào cờ */
+
+/* 3 cột cuối */
+.violation-table th:nth-last-child(3),
+.violation-table td:nth-last-child(3) { width: 40px; }  /* Khác */
+.violation-table th:nth-last-child(2),
+.violation-table td:nth-last-child(2) { width: 108px; } /* Chi tiết khác */
+.violation-table th:last-child,
+.violation-table td:last-child { width: 50px; }         /* Tổng */
+.violation-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+.violation-table tbody tr:hover {
+  background: #eff6ff;
+}
+.violation-table td:last-child {
+  font-weight: 700;
+  color: #dc2626;
+}
+
+/* Cột "Chi tiết khác": tên lỗi gõ tay */
+.violation-table td.khac-cell {
+  white-space: normal;
+}
+.khac-names {
+  display: inline-block;
+  max-width: 100%;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: #b45309;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Bảng gộp */
+#mergeTable thead {
+  background: #d97706;
+  color: white;
+}
+#mergeTable tbody tr:nth-child(even) {
+  background: #fffbeb;
+}
+#mergeTable tbody tr:hover {
+  background: #fef3c7;
+}
+
+/* ===== DANH SÁCH / FILTER ===== */
+.filter-box {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.filter-box .left {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.filter-btn:hover {
+  background: var(--primary-dark);
+}
+.filter-btn.gray {
+  background: #64748b;
+}
+.filter-btn.gray:hover {
+  background: #475569;
+}
+#filterDate {
+  padding: 10px 14px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  min-width: 180px;
+}
+
+/* Pagination */
+#pagination,
+#paginationTop {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+#pagination,
+#paginationTop {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+#pagination button,
+#paginationTop button {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+#pagination button:hover,
+#paginationTop button:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+/* Trang đang chọn */
+#pagination button[style*="background"],
+#paginationTop button[style*="background"] {
+  background: #1f58d2 !important;
+  border-color: rgba(31, 88, 210, 0.2) !important;
+  color: white !important;
+  box-shadow: 0 8px 18px rgba(31, 88, 210, 0.22);
+}
+
+/* Credit */
+.credit {
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
+  left:auto;
+  font-size: 7px;
+  color: #94a3b8;
+  opacity: 0.7;
+  z-index: 999;
+  user-select: none;
+}
+.credit:hover {
+  opacity: 1;
+}
+
+/* Responsive */
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  #sidebar {
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  #sidebar .title {
+    color: #e0e7ff;
+    background: rgba(10, 15, 35, 0.74);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  #app {
+    flex-direction: column !important;
+    display: flex !important;
+  }
+
+  #sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px !important;
+    align-content: start;
+  }
+
+  #sidebar .title {
+    grid-column: 1 / -1;
+    font-size: 15px;
+    padding: 8px 0;
+    margin-bottom: 4px;
+    /* Ghim tiêu đề trên đỉnh khi quẹt xuống (giữ nguyên giao diện cũ) */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 30;
+    margin: 0;
+    padding: 12px;
+    background: rgba(10, 15, 35, 0.74);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #e0e7ff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  #sidebar {
+    padding-top: 52px !important; /* chừa chỗ cho tiêu đề ghim bên trên */
+  }
+
+  #sidebar .btn-base {
+    width: 100% !important;
+    margin-top: 0 !important;
+    padding: 12px 8px !important;
+    font-size: 12px !important;
+    min-height: 48px !important;
+    border-radius: 10px !important;
+  }
+
+  #app > .flex-1 {
+    width: 100% !important;
+    padding: 12px !important;
+    min-width: 0 !important;
+  }
+
+  #globalSearch {
+    font-size: 16px !important;
+    padding: 12px !important;
+  }
+
+  #content.grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  #content button {
+    width: 100% !important;
+    min-height: 52px !important;
+    padding: 14px 12px !important;
+    font-size: 15px !important;
+    text-align: left !important;
+  }
+
+  #calendar {
+    max-width: 100%;
+  }
+
+  table.calendar-table td {
+    height: 44px;
+    font-size: 15px;
+  }
+
+  #calendar-header button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .filter-box,
+  .filter-box .left {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100%;
+  }
+
+  .filter-btn,
+  .btn-trash,
+  .btn-confirm-delete,
+  .btn-cancel-select {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  #filterDate {
+    width: 100%;
+    min-height: 44px;
+    font-size: 16px;
+  }
+}
+/* Bọc bảng — vuốt ngang trên mobile */
+.table-scroll {
+  width: 100%;
+  overflow: auto;
+  max-height: 78vh;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Màn hình đủ rộng: bảng vừa khung -> bỏ khung cuộn để header dính theo trang */
+@media (min-width: 1200px) {
+  .table-scroll {
+    overflow: visible;
+    max-height: none;
+  }
+}
+
+.table-scroll table {
+  min-width: 980px; /* đủ chỗ cho mọi cột, không bị cắt */
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .table-scroll table {
+    font-size: 13px;
+  }
+  .table-scroll th,
+  .table-scroll td {
+    padding: 8px 10px;
+    white-space: nowrap; /* tránh chữ xuống dòng làm hẹp cột */
+  }
+}
+/* ===== LỊCH – MOBILE ===== */
+@media (max-width: 768px) {
+
+  /* Không cần bảng quá rộng nữa */
+  #violationTable,
+  #mergeTable {
+    min-width: 900px !important;
+    width: 100% !important;
+  }
+
+  #violationTable th,
+  #violationTable td,
+  #mergeTable th,
+  #mergeTable td {
+    white-space: normal;
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+  /* Trang lịch */
+  body {
+    padding: 10px !important;
+  }
+
+  .main-layout {
+    padding: 8px 0 24px !important;
+    gap: 16px !important;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  /* Lịch full ngang, ô to hơn */
+  #calendar {
+    max-width: 100% !important;
+    padding: 12px !important;
+    border-radius: 12px;
+  }
+
+  #calendar-header span {
+    font-size: 1.1rem;
+  }
+
+  #calendar-header button {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 16px;
+  }
+
+  table.calendar-table th {
+    font-size: 12px;
+    padding: 6px 2px;
+  }
+
+  table.calendar-table td {
+    height: 46px !important;
+    font-size: 15px !important;
+  }
+
+  /* Khối chi tiết */
+  #details {
+    padding: 14px 12px 20px !important;
+    border-radius: 12px;
+  }
+
+  #details h3 {
+    font-size: 1rem;
+  }
+
+  #selectedDaysLabel {
+    font-size: 13px;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  /* Bảng chi tiết + gộp: vuốt ngang */
+  #details .violation-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 12px;
+  }
+
+  /* Ép table bên trong đủ rộng để không cắt cột */
+  #violationTable,
+  #mergeTable {
+    min-width: 900px;
+    width: 100%;
+  }
+
+  #violationTable th,
+  #violationTable td,
+  #mergeTable th,
+  #mergeTable td {
+    padding: 8px 6px;
+    white-space: nowrap;
+  }
+
+  /* Nút Xuất / Gộp */
+  .export-wrapper {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .btn-export {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 768px) {
+  #violationTable,
+  #mergeTable {
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+  }
+
+  /* Bo góc 4 góc của hàng header */
+  #violationTable thead th:first-child,
+  #mergeTable thead th:first-child {
+    border-top-left-radius: 10px;
+  }
+  #violationTable thead th:last-child,
+  #mergeTable thead th:last-child {
+    border-top-right-radius: 10px;
+  }
+}
+@media (max-width: 768px) {
+  .main-layout {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100%;
+  }
+
+  .calendar-top {
+    width: 100%;
+  }
+
+  #calendar,
+  #details {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 12px !important;
+  }
+
+  #details {
+    padding: 14px 12px 20px !important;
+  }
+}
+@media (max-width: 768px) {
+  .main-layout {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  #calendar,
+  #details {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    border-radius: 12px !important;
+  }
+
+  #violationTable,
+  #mergeTable {
+    border-radius: 10px !important;
+    overflow: clip !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    min-width: 900px !important;
+    width: 100% !important;
+  }
+
+  #violationTable thead th:first-child,
+  #mergeTable thead th:first-child {
+    border-top-left-radius: 10px;
+  }
+  #violationTable thead th:last-child,
+  #mergeTable thead th:last-child {
+    border-top-right-radius: 10px;
+  }
+}
+@media (max-width: 768px) {
+  /* Bảng lịch: vuốt ngang như index */
+  #details .table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+    margin-top: 8px;
+  }
+
+  #details .table-scroll table {
+    min-width: 720px;   /* đủ cột, quẹt để thấy Tổng */
+    width: max-content;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  #details .table-scroll th,
+  #details .table-scroll td {
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+
+  /* Không ép display:block lên table (làm gãy layout) */
+  #details .violation-table {
+    display: table;
+    overflow: visible;
+  }
+     #status {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 12px !important;
+    line-height: 1.35;
+    padding: 8px 10px !important;
+    margin-bottom: 8px !important;
+
+    white-space: nowrap;           /* 1 dòng */
+    overflow-x: auto;              /* dài thì vuốt ngang */
+    -webkit-overflow-scrolling: touch;
+  }
+    #status {
+    font-size: 11px !important;
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+}
+
+/* =========================================================
+   NỀN SIDEBAR "HUYỀN ẢO" (giống trang đăng nhập)
+   ========================================================= */
+#sidebar {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 85% at 12% 0%, rgba(59, 130, 246, 0.55) 0%, rgba(59, 130, 246, 0) 58%),
+    radial-gradient(120% 85% at 105% 102%, rgba(139, 92, 246, 0.55) 0%, rgba(139, 92, 246, 0) 58%),
+    linear-gradient(165deg, #1b2458 0%, #271a52 46%, #090d1f 100%);
+}
+
+#sidebar::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.62;
+  background-image:
+    radial-gradient(1.5px 1.5px at 24px 32px, rgba(255, 255, 255, 0.95), transparent 100%),
+    radial-gradient(1px 1px at 88px 76px, rgba(191, 219, 254, 0.9), transparent 100%),
+    radial-gradient(1.6px 1.6px at 148px 24px, rgba(255, 255, 255, 0.7), transparent 100%),
+    radial-gradient(1px 1px at 200px 108px, rgba(196, 181, 253, 0.95), transparent 100%),
+    radial-gradient(1.2px 1.2px at 56px 140px, rgba(255, 255, 255, 0.6), transparent 100%),
+    radial-gradient(1px 1px at 236px 176px, rgba(147, 197, 253, 0.85), transparent 100%),
+    radial-gradient(1.4px 1.4px at 120px 200px, rgba(255, 255, 255, 0.65), transparent 100%),
+    radial-gradient(1px 1px at 16px 220px, rgba(233, 213, 255, 0.75), transparent 100%);
+  background-size: 260px 260px;
+  background-repeat: repeat;
+  animation: sbTwinkle 6.5s ease-in-out infinite alternate;
+}
+
+#sidebar::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 360px;
+  height: 360px;
+  left: -130px;
+  top: 18%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.5) 0%, rgba(56, 189, 248, 0.18) 46%, transparent 72%);
+  filter: blur(28px);
+  animation: sbFloat 16s ease-in-out infinite alternate;
+}
+
+#sidebar > * {
+  position: relative;
+  z-index: 2;
+}
+
+#sidebar .title {
+  letter-spacing: 1px;
+  text-shadow: 0 2px 18px rgba(147, 197, 253, 0.5);
+}
+
+@keyframes sbTwinkle {
+  from { opacity: 0.42; }
+  to   { opacity: 0.9; }
+}
+
+@keyframes sbFloat {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(46px, -44px, 0) scale(1.18); }
+}
+
+/* =========================================================
+   ĐỒNG BỘ "DA" NÚT TOÀN APP
+   (cùng kiểu nút Trang chủ ở Điểm danh — giữ nguyên màu cũ)
+   ========================================================= */
+.btn,
+.btn-base,
+.btn-quick,
+.btn-export,
+.btn-add-dd,
+.btn-delete,
+.dd-xoa,
+.btn-trash,
+.btn-confirm-delete,
+.btn-cancel-select,
+.filter-btn,
+.top-link,
+.btn-sm,
+.refresh-btn,
+.google-btn,
+.ai-btn,
+.row button,
+.primary,
+.danger,
+#violationTable button,
+#content > button:not(.pick-btn):not(.rank-tab) {
+  border-radius: 10px !important;
+  font-family: inherit;
+  font-weight: 600 !important;
+  letter-spacing: 0.1px;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn,
+.btn-export,
+.btn-add-dd,
+.filter-btn,
+.top-link,
+.btn-sm,
+.refresh-btn,
+#violationTable button,
+#content > button:not(.pick-btn):not(.rank-tab) {
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+}
+
+.btn:hover:not(:disabled),
+.btn-base:hover:not(:disabled),
+.btn-quick:hover:not(:disabled),
+.btn-export:hover:not(:disabled),
+.btn-add-dd:hover:not(:disabled),
+.btn-delete:hover:not(:disabled),
+.dd-xoa:hover:not(:disabled),
+.btn-trash:hover:not(:disabled),
+.btn-confirm-delete:hover:not(:disabled),
+.btn-cancel-select:hover:not(:disabled),
+.filter-btn:hover:not(:disabled),
+.top-link:hover,
+.btn-sm:hover:not(:disabled),
+.refresh-btn:hover:not(:disabled),
+.google-btn:hover:not(:disabled),
+.ai-btn:hover:not(:disabled),
+.row button:hover:not(:disabled),
+.primary:hover:not(:disabled),
+.danger:hover:not(:disabled),
+#violationTable button:hover:not(:disabled),
+#content > button:not(.pick-btn):not(.rank-tab):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+}
+
+.btn:active:not(:disabled),
+.btn-quick:active:not(:disabled),
+.btn-export:active:not(:disabled),
+.btn-add-dd:active:not(:disabled),
+.filter-btn:active:not(:disabled),
+.top-link:active,
+.google-btn:active:not(:disabled),
+.ai-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn:focus-visible,
+.btn-base:focus-visible,
+.btn-quick:focus-visible,
+.btn-export:focus-visible,
+.btn-add-dd:focus-visible,
+.btn-delete:focus-visible,
+.dd-xoa:focus-visible,
+.filter-btn:focus-visible,
+.top-link:focus-visible,
+.btn-sm:focus-visible,
+.refresh-btn:focus-visible,
+.google-btn:focus-visible,
+.ai-btn:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}

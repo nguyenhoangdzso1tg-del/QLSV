@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Điểm danh</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- SheetJS (dùng cho trang danh sách) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e40af">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="theme.css">
+  <script src="theme-init.js"></script>
+
+  <style>
+    /* ===== Thẻ sinh viên + 3 chấm trạng thái ===== */
+    .sv-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px 8px 14px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.10);
+      border: 2px solid transparent;
+      transition: border-color .15s ease, background .15s ease;
+      min-width: 0;
+    }
+    .sv-card.status-kp { border-color: #fca5a5; background: #fff7f7; }
+    .sv-card.status-cp { border-color: #fde68a; background: #fffdf3; }
+    .sv-card.status-kv { border-color: #bbf7d0; background: #f8fffa; }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 7px;
+    }
+    .dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 9999px;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      opacity: .28;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: opacity .15s ease;
+    }
+    .dot.red    { background: #dc2626; }
+    .dot.yellow { background: #eab308; }
+    .dot.green  { background: #16a34a; }
+    .dot:hover  { opacity: .55; }
+
+    /* Chỉ hiện DẤU TÍCH ở ô đang chọn */
+    .dot::after {
+      content: "✓";
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1;
+      color: #fff;
+      opacity: 0;
+      transition: opacity .12s ease;
+    }
+    .dot.active { opacity: 1; }
+    .dot.active::after { opacity: 1; }
+
+    .sv-ten {
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+    .sv-ma  { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+    /* ===== Lưới: chọn khoa/khóa/lớp (2–3 cột) ===== */
+    #contentDD {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (min-width: 900px) {
+      #contentDD { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    }
+
+    /* ===== Lưới sinh viên: điện thoại 3 bạn/hàng ===== */
+    #contentDD.sv-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    @media (min-width: 640px) {
+      #contentDD.sv-grid { gap: 12px; }
+    }
+    @media (min-width: 900px) {
+      #contentDD.sv-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    }
+    @media (min-width: 1280px) {
+      #contentDD.sv-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    }
+    @media (max-width: 360px) {
+      #contentDD.sv-grid { gap: 6px; }
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      font-size: 13px;
+      color: #334155;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+    .legend .lg { display: inline-flex; align-items: center; gap: 6px; }
+    .legend .lg i {
+      width: 14px; height: 14px; border-radius: 9999px; display: inline-block;
+    }
+
+    .sum-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: #334155;
+    }
+    .sum-chip b { font-size: 15px; }
+
+    /* Nút thêm nhanh cạnh ô ngày */
+    .btn-add-dd {
+      background: #0891b2;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-add-dd:hover { background: #0e7490; }
+
+    /* ===== Tìm lớp ===== */
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .search-wrap > i {
+      position: absolute;
+      left: 14px;
+      color: #94a3b8;
+      font-size: 14px;
+      pointer-events: none;
+    }
+    #searchLop {
+      width: 100%;
+      padding: 11px 42px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    #searchLop:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    #searchClear {
+      position: absolute;
+      right: 8px;
+      width: 27px;
+      height: 27px;
+      border: none;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      color: #475569;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    #searchClear.show { display: flex; }
+
+    /* ===== Nút chọn khoa / khóa / lớp / kết quả tìm ===== */
+    .pick-btn {
+      background: #fff;
+      padding: 13px 14px;
+      border-radius: 10px;
+      text-align: left;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.10);
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      color: #0f172a;
+      transition: background .15s ease, border-color .15s ease;
+      min-width: 0;
+    }
+    .pick-btn:hover { background: #eff6ff; border-color: #bfdbfe; }
+    .pick-btn .pick-main { word-break: break-word; }
+    .pick-btn .sub {
+      font-size: 12px;
+      font-weight: 500;
+      color: #64748b;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+
+    /* ===== Bảng danh sách điểm danh (chờ gửi) ===== */
+    .dd-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      padding: 0 8px;
+      border-radius: 9999px;
+      background: #0e7490;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    .dd-section {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 14px 4px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    }
+    .dd-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .dd-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dd-table-wrap {
+      overflow-x: auto;
+      margin-bottom: 6px;
+    }
+    .dd-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: transparent;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 14px;
+    }
+    .dd-table thead { background: #e2e8f0; }
+    .dd-table th, .dd-table td {
+      padding: 10px 8px;
+      text-align: center;
+      word-break: break-word;
+    }
+    .dd-table th { font-weight: 700; color: #334155; font-size: 13px; }
+    .dd-table tbody tr { border-top: 1px solid #e2e8f0; }
+    .dd-table tbody tr:nth-child(even) { background: #f8fafc; }
+    .dd-table td.ten { text-align: left; font-weight: 600; }
+    .dd-table .tiny { display: none; font-size: 11.5px; color: #64748b; font-weight: 500; margin-top: 2px; }
+    .dd-table .empty { color: #64748b; padding: 18px; font-weight: 500; }
+
+    .dd-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .dd-badge.cp { background: #fef9c3; color: #854d0e; }
+    .dd-badge.kp { background: #fee2e2; color: #991b1b; }
+
+    .dd-xoa {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .dd-xoa:hover { background: #dc2626; }
+
+    @media (max-width: 767px) {
+      .dd-table { font-size: 12.5px; table-layout: fixed; }
+      .dd-table th, .dd-table td { padding: 8px 4px; }
+      .dd-table th.col-lop, .dd-table td.col-lop,
+      .dd-table th.col-khoa, .dd-table td.col-khoa,
+      .dd-table th.col-nganh, .dd-table td.col-nganh,
+      .dd-table th.col-buoi, .dd-table td.col-buoi,
+      .dd-table th.col-nguoi, .dd-table td.col-nguoi {
+        display: none;
+      }
+      .dd-table th.col-xoa, .dd-table td.col-xoa { width: 44px; }
+      .dd-table .tiny { display: block; font-size: 10.5px; }
+      .dd-badge { font-size: 10.5px; padding: 3px 6px; }
+      .dd-xoa { padding: 4px 7px; }
+      .dd-table-wrap { overflow-x: visible; }
+      .dd-table { table-layout: fixed; }
+    }
+
+    @media (max-width: 640px) {
+      .main-pad { padding: 12px !important; }
+
+      .sv-card {
+        padding: 7px 4px 9px;
+        border-radius: 10px;
+        border-width: 1.5px;
+      }
+      .dots { gap: 4px; margin-bottom: 5px; }
+      .dot { width: 20px; height: 20px; }
+      .dot::after { font-size: 11px; }
+
+      .sv-ten { font-size: 12px; line-height: 1.2; }
+      .sv-ma  { font-size: 9.5px; margin-top: 1px; }
+
+      #title { font-size: 17px; margin-bottom: 10px; }
+
+      .legend {
+        gap: 8px;
+        font-size: 11px;
+        padding: 7px 9px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+      }
+      .legend .lg { gap: 4px; }
+      .legend .lg i { width: 10px; height: 10px; }
+
+      .sum-chip { padding: 6px 9px; font-size: 11.5px; border-radius: 8px; }
+      .sum-chip b { font-size: 13px; }
+      #toolbar { gap: 6px; }
+      #ngayDiemDanh { padding: 6px 8px; font-size: 12px; }
+      #toolbar label { font-size: 12px; }
+
+      .search-wrap { margin-bottom: 10px; }
+      #searchLop { font-size: 13px; padding: 9px 38px; }
+      .search-wrap > i { left: 12px; font-size: 12px; }
+      .pick-btn { font-size: 13px; padding: 10px; }
+      .pick-btn .sub { font-size: 11px; margin-top: 2px; }
+      .btn-add-dd { width: 100%; justify-content: center; padding: 9px 10px; font-size: 12.5px; }
+
+      .dd-section { padding: 10px 10px 2px; margin-bottom: 12px; border-radius: 10px; }
+      .dd-head { gap: 8px; margin-bottom: 8px; }
+      .dd-title { font-size: 15px; }
+      .dd-count { min-width: 22px; height: 22px; font-size: 12px; padding: 0 6px; }
+    }
+
+    /* ===== Buổi điểm danh (Sáng / Chiều) ===== */
+    .buoi-seg {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px;
+      background: #e2e8f0;
+      border-radius: 10px;
+    }
+    .buoi-btn {
+      border: 0;
+      background: transparent;
+      color: #475569;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+    }
+    .buoi-btn:hover { background: rgba(255, 255, 255, .55); }
+    .buoi-btn.active {
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, .16);
+    }
+    .buoi-btn.active[data-buoi="sang"] i { color: #f59e0b; }
+    .buoi-btn.active[data-buoi="chieu"] i { color: #6366f1; }
+
+    .btn-quick {
+      border: 0;
+      background: #0f766e;
+      color: #fff;
+      padding: 9px 13px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-quick:hover { background: #115e59; }
+
+    @media (min-width: 769px) {
+      #toolbar {
+        position: sticky;
+        top: 10px;
+        z-index: 25;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        background: rgba(243, 244, 246, .94);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+      }
+      [data-theme="dark"] #toolbar {
+        background: rgba(15, 23, 42, .92);
+        border-color: #334155;
+      }
+    }
+
+    /* ===== Trợ lý chat (ChatGPT-like) ===== */
+    .chat-fab {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 80;
+      width: 58px;
+      height: 58px;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      box-shadow: 0 14px 34px rgba(37, 99, 235, .45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .chat-fab:hover { transform: translateY(-2px); }
+    .chat-fab::after {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border-radius: 9999px;
+      border: 2px solid rgba(124, 58, 237, .35);
+      animation: chatPulse 2.6s ease-out infinite;
+      pointer-events: none;
+    }
+    .chat-fab .chat-fab-dot {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 10px;
+      height: 10px;
+      border-radius: 9999px;
+      background: #22c55e;
+      border: 2px solid #fff;
+    }
+    @keyframes chatPulse {
+      0%   { transform: scale(.92); opacity: .9; }
+      70%  { transform: scale(1.18); opacity: 0; }
+      100% { transform: scale(1.18); opacity: 0; }
+    }
+
+    .chat-panel {
+      position: fixed;
+      right: 18px;
+      bottom: 88px;
+      z-index: 81;
+      width: min(410px, calc(100vw - 36px));
+      height: min(640px, calc(100vh - 120px));
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, .35);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: chatIn .18s ease both;
+    }
+    @keyframes chatIn {
+      from { opacity: 0; transform: translateY(10px) scale(.98); }
+      to   { opacity: 1; transform: none; }
+    }
+    .chat-fab.hidden, .chat-panel.hidden, .chat-settings.hidden { display: none !important; }
+
+    .chat-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      background: linear-gradient(135deg, #312e81, #6d28d9 55%, #2563eb);
+    }
+    .chat-id { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .chat-ava {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, .16);
+      border: 1px solid rgba(255, 255, 255, .25);
+      font-size: 15px;
+    }
+    .chat-name { font-weight: 700; font-size: 14px; line-height: 1.2; }
+    .chat-status { font-size: 11px; color: rgba(255, 255, 255, .78); }
+    .chat-head-actions { display: flex; gap: 6px; flex: 0 0 auto; }
+    .chat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+    .chat-icon:hover { background: rgba(255, 255, 255, .22); }
+
+    .chat-msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chat-msg {
+      max-width: 90%;
+      padding: 9px 12px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .chat-msg.bot {
+      align-self: flex-start;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      color: #0f172a;
+      border-bottom-left-radius: 5px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, .06);
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff;
+      border-bottom-right-radius: 5px;
+    }
+    .chat-msg.sys {
+      align-self: center;
+      max-width: 100%;
+      background: transparent;
+      color: #64748b;
+      font-size: 11.5px;
+      padding: 2px 6px;
+      text-align: center;
+    }
+    .chat-msg.bot b { color: #4338ca; }
+    .chat-typing { display: inline-flex; gap: 4px; align-items: center; height: 12px; }
+    .chat-typing span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #a5b4fc;
+      animation: typingDot 1s infinite ease-in-out;
+    }
+    .chat-typing span:nth-child(2) { animation-delay: .15s; }
+    .chat-typing span:nth-child(3) { animation-delay: .3s; }
+    @keyframes typingDot {
+      0%, 80%, 100% { transform: translateY(0); opacity: .45; }
+      40% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .chat-chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 12px 0;
+      background: #fff;
+      scrollbar-width: none;
+    }
+    .chat-chips::-webkit-scrollbar { display: none; }
+    .chat-chip {
+      flex: 0 0 auto;
+      border: 1px solid #c7d2fe;
+      background: #eef2ff;
+      color: #4338ca;
+      border-radius: 9999px;
+      padding: 6px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .chat-chip:hover { background: #e0e7ff; }
+
+    .chat-form {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px 6px;
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+      align-items: flex-end;
+    }
+    #chatInput {
+      flex: 1;
+      resize: none;
+      max-height: 110px;
+      min-height: 42px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      line-height: 1.4;
+      font-family: inherit;
+      background: #fff;
+      color: #0f172a;
+    }
+    #chatInput:focus { outline: 2px solid #c7d2fe; outline-offset: 0; border-color: #818cf8; }
+    .chat-send {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      border-radius: 12px;
+      border: none;
+      background: #7c3aed;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chat-send:hover { background: #6d28d9; }
+    .chat-send:disabled { opacity: .5; cursor: wait; }
+    .chat-foot {
+      font-size: 10.5px;
+      color: #94a3b8;
+      text-align: center;
+      padding: 0 10px 8px;
+      background: #fff;
+    }
+
+    /* Thẻ duyệt điểm danh trong chat */
+    .chat-review {
+      width: 100%;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, .07);
+    }
+    .rev-head {
+      padding: 8px 10px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 12.5px;
+      color: #334155;
+    }
+    .rev-head b { color: #0f172a; }
+    .rev-scroll { max-height: 250px; overflow: auto; }
+    .chat-review table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .chat-review th {
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      text-align: left;
+      padding: 6px;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .chat-review td { border-top: 1px solid #eef2f7; padding: 6px; vertical-align: middle; }
+    .chat-review select {
+      max-width: 150px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      padding: 4px 5px;
+      font-size: 12px;
+      background: #fff;
+      color: #0f172a;
+    }
+    .chat-review .rev-check { width: 17px; height: 17px; }
+    .rev-note { font-size: 10.5px; color: #92400e; margin-top: 2px; line-height: 1.3; }
+    .chat-review tbody tr.rev-warn td { background: #fffbeb; }
+    .rev-actions { display: flex; gap: 8px; padding: 8px; border-top: 1px solid #e2e8f0; }
+    .rev-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .rev-btn:hover { background: #eef2f7; }
+    .rev-btn.primary { flex: 1.5; background: #16a34a; border-color: #16a34a; color: #fff; }
+    .rev-btn.primary:hover { background: #15803d; }
+
+    /* Cài đặt trợ lý */
+    .chat-settings {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: rgba(15, 23, 42, .55);
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .chat-settings-card {
+      width: 100%;
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 18px 50px rgba(2, 6, 23, .4);
+    }
+    .chat-settings-card h3 { margin: 0 0 6px; font-size: 15px; color: #0f172a; }
+    .chat-settings-card p { margin: 0 0 10px; font-size: 11.5px; color: #64748b; line-height: 1.5; }
+    .chat-settings-card label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin: 8px 0 4px; }
+    .chat-settings-card input,
+    .chat-settings-card select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      font-size: 13px;
+      margin-bottom: 6px;
+      box-sizing: border-box;
+      background: #fff;
+      color: #0f172a;
+    }
+    .chat-settings-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .chat-settings-note { font-size: 10.5px; color: #94a3b8; margin-top: 8px; line-height: 1.45; }
+
+    .btn-base:disabled { opacity: .45; cursor: not-allowed; transform: none !important; }
+
+    [data-theme="dark"] .buoi-seg { background: #1e293b; }
+    [data-theme="dark"] .buoi-btn { color: #cbd5e1; }
+    [data-theme="dark"] .buoi-btn:hover { background: rgba(255, 255, 255, .08); }
+    [data-theme="dark"] .buoi-btn.active { background: #334155; color: #f1f5f9; }
+    [data-theme="dark"] .chat-panel { background: #0f172a; border-color: #334155; }
+    [data-theme="dark"] .chat-msgs { background: linear-gradient(180deg, #0b1220, #111a2e); }
+    [data-theme="dark"] .chat-msg.bot { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+    [data-theme="dark"] .chat-msg.bot b { color: #a5b4fc; }
+    [data-theme="dark"] .chat-msg.sys { color: #94a3b8; }
+    [data-theme="dark"] .chat-chips,
+    [data-theme="dark"] .chat-form,
+    [data-theme="dark"] .chat-foot { background: #0f172a; border-color: #1e293b; }
+    [data-theme="dark"] .chat-chip { background: #1e1b4b; border-color: #3730a3; color: #c7d2fe; }
+    [data-theme="dark"] .chat-chip:hover { background: #312e81; }
+    [data-theme="dark"] #chatInput { background: #111c2e; border-color: #334155; color: #e2e8f0; }
+    [data-theme="dark"] .chat-review { background: #111c2e; border-color: #334155; }
+    [data-theme="dark"] .rev-head { background: #0b1220; border-color: #334155; color: #cbd5e1; }
+    [data-theme="dark"] .rev-head b { color: #e2e8f0; }
+    [data-theme="dark"] .chat-review th { background: #0b1220; color: #94a3b8; }
+    [data-theme="dark"] .chat-review td { border-color: #1e293b; color: #e2e8f0; }
+    [data-theme="dark"] .chat-review select { background: #0f172a; color: #e2e8f0; border-color: #475569; }
+    [data-theme="dark"] .chat-review tbody tr.rev-warn td { background: #2b2410; }
+    [data-theme="dark"] .rev-actions { border-color: #334155; }
+    [data-theme="dark"] .rev-btn { background: #1e293b; border-color: #475569; color: #e2e8f0; }
+    [data-theme="dark"] .rev-btn:hover { background: #334155; }
+    [data-theme="dark"] .chat-settings-card { background: #111c2e; }
+    [data-theme="dark"] .chat-settings-card h3 { color: #e2e8f0; }
+    [data-theme="dark"] .chat-settings-card p { color: #94a3b8; }
+    [data-theme="dark"] .chat-settings-card label { color: #cbd5e1; }
+    [data-theme="dark"] .chat-settings-card input,
+    [data-theme="dark"] .chat-settings-card select { background: #0f172a; border-color: #475569; color: #e2e8f0; }
+
+    @media (max-width: 640px) {
+      .chat-panel {
+        right: 8px;
+        left: 8px;
+        bottom: 8px;
+        width: auto;
+        height: min(80vh, 640px);
+        border-radius: 16px;
+      }
+      .chat-fab { right: 14px; bottom: 14px; width: 54px; height: 54px; }
+      .buoi-btn { padding: 7px 11px; }
+      .btn-quick { padding: 8px 10px; }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+<div id="app" class="hidden flex flex-col md:flex-row min-h-screen">
+
+  <!-- ===== SIDEBAR ===== -->
+  <div id="sidebar" class="w-full md:w-64 text-white p-4 flex flex-col shrink-0">
+    <h1 class="title">ĐIỂM DANH</h1>
+
+    <button id="btnBack" type="button" onclick="goBack()" class="btn-base btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </button>
+
+    <a href="index.html" class="btn-base" style="background:#0e7490 !important;">
+      <i class="fa-solid fa-house"></i> Trang chủ
+    </a>
+
+    
+
+    <button id="btnGuiDiemDanh" onclick="guiDiemDanh()" class="btn-base btn-send">
+      <i class="fa-solid fa-paper-plane"></i> Gửi
+    </button>
+
+    <a href="danhsach-diemdanh.html" class="btn-base btn-yellow">
+      <i class="fa-solid fa-list"></i> Danh sách
+    </a>
+
+    <a href="profile.html" class="btn-base" style="background:#0f766e !important;">
+      <i class="fa-solid fa-user"></i> Hồ sơ
+    </a>
+  </div>
+
+  <!-- ===== MAIN ===== -->
+  <div class="flex-1 p-6 main-pad">
+
+    <div id="cosoline"
+         class="mb-3 text-sm text-blue-700 font-medium bg-blue-50 p-2 rounded">
+      Cơ sở: —
+    </div>
+
+    <div id="status"
+         class="mb-3 text-sm text-gray-700 font-medium bg-blue-50 p-2 rounded">
+      Khoa: — | Khóa: — | Lớp: —
+    </div>
+
+    <div class="legend">
+      <span class="lg"><i style="background:#dc2626"></i> Vắng không phép</span>
+      <span class="lg"><i style="background:#eab308"></i> Vắng có phép</span>
+      <span class="lg"><i style="background:#16a34a"></i> Không vắng (mặc định)</span>
+    </div>
+
+    <!-- Tìm lớp nhanh -->
+    <div class="search-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="searchLop" type="text" autocomplete="off"
+             placeholder="Tìm lớp nhanh (tên lớp, khóa, khoa...)">
+      <button type="button" id="searchClear" title="Xoá tìm kiếm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <h1 class="text-2xl font-bold mb-4" id="title">Chọn khoa</h1>
+
+    <!-- Ngày điểm danh + buổi + thống kê nhanh (chỉ hiện khi đã chọn lớp) -->
+    <div id="toolbar" class="hidden mb-4 flex flex-wrap items-center gap-3">
+      <label class="text-sm font-semibold text-gray-700">Ngày:</label>
+      <input type="date" id="ngayDiemDanh"
+             class="border p-2 rounded bg-white text-sm">
+
+      <div class="buoi-seg" id="buoiSeg" role="group" aria-label="Chọn buổi điểm danh">
+        <button type="button" class="buoi-btn active" data-buoi="sang">
+          <i class="fa-solid fa-sun"></i> Sáng
+        </button>
+        <button type="button" class="buoi-btn" data-buoi="chieu">
+          <i class="fa-solid fa-moon"></i> Chiều
+        </button>
+      </div>
+
+      <button type="button" class="btn-quick" id="btnAllPresent"
+              title="Đặt tất cả sinh viên của lớp thành “Không vắng”">
+        <i class="fa-solid fa-rotate-left"></i> Tất cả có mặt
+      </button>
+
+      <div class="flex flex-wrap gap-2 ml-auto">
+        <span class="sum-chip">Tổng: <b id="sumTotal">0</b></span>
+        <span class="sum-chip" style="color:#15803d">Có mặt: <b id="sumKhong">0</b></span>
+        <span class="sum-chip" style="color:#a16207">Vắng có phép: <b id="sumCP">0</b></span>
+        <span class="sum-chip" style="color:#b91c1c">Vắng không phép: <b id="sumKP">0</b></span>
+      </div>
+    </div>
+
+    <!-- ===== DANH SÁCH ĐIỂM DANH (chờ gửi) — nằm TRÊN lưới sinh viên ===== -->
+    <div class="dd-section">
+      <div class="dd-head">
+        <h2 class="dd-title">
+          Danh sách điểm danh <span id="ddCount" class="dd-count">0</span>
+        </h2>
+
+        <button type="button" id="btnThemDD2" onclick="themVaoDanhSach()" class="btn-add-dd">
+          <i class="fa-solid fa-plus"></i> Thêm vào danh sách
+        </button>
+      </div>
+
+      <div class="dd-table-wrap">
+        <table class="dd-table">
+          <thead>
+            <tr>
+              <th>Mã SV</th>
+              <th>Họ tên</th>
+              <th class="col-lop">Lớp</th>
+              <th class="col-khoa">Khóa</th>
+              <th class="col-nganh">Khoa</th>
+              <th>Ngày</th>
+              <th class="col-buoi">Buổi</th>
+              <th>Trạng thái</th>
+              <th class="col-nguoi">Người nhập</th>
+              <th class="col-xoa">Xóa</th>
+            </tr>
+          </thead>
+          <tbody id="ddTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="contentDD"></div>
+  </div>
+</div>
+
+<!-- ===== TRỢ LÝ AI (chat nổi) ===== -->
+<button id="chatFab" class="chat-fab hidden" type="button"
+        title="Mở trợ lý điểm danh" aria-label="Mở trợ lý điểm danh">
+  <i class="fa-solid fa-wand-magic-sparkles"></i>
+  <span class="chat-fab-dot"></span>
+</button>
+
+<section id="chatPanel" class="chat-panel hidden" aria-label="Trợ lý điểm danh">
+  <header class="chat-head">
+    <div class="chat-id">
+      <div class="chat-ava"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+      <div>
+        <div class="chat-name">Trợ lý điểm danh</div>
+        <div class="chat-status" id="chatStatus">Ngoại tuyến · hiểu lệnh cơ bản</div>
+      </div>
+    </div>
+    <div class="chat-head-actions">
+      <button type="button" class="chat-icon" id="chatSettingsBtn" title="Cài đặt AI">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+      <button type="button" class="chat-icon" id="chatClearBtn" title="Cuộc trò chuyện mới">
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+      <button type="button" class="chat-icon" id="chatCloseBtn" title="Đóng">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="chat-msgs" id="chatMsgs" aria-live="polite"></div>
+
+  <div class="chat-chips" id="chatChips"></div>
+
+  <form class="chat-form" id="chatForm">
+    <textarea id="chatInput" rows="1" autocomplete="off"
+              placeholder="Nhập câu điểm danh hoặc câu hỏi…"></textarea>
+    <button class="chat-send" id="chatSend" type="submit" title="Gửi">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
+  </form>
+  <div class="chat-foot" id="chatFoot">
+    Trợ lý chạy trên máy · bật Gemini trong ⚙ để hiểu câu phức tạp hơn
+  </div>
+
+  <div class="chat-settings hidden" id="chatSettings">
+    <div class="chat-settings-card">
+      <h3><i class="fa-solid fa-key" style="color:#7c3aed"></i> Kết nối AI nâng cao</h3>
+      <p>Dán khóa Google Gemini để trợ lý hiểu câu hỏi tự nhiên hơn. Khóa chỉ lưu trên trình duyệt này.</p>
+
+      <label for="chatApiKey">Gemini API key</label>
+      <input id="chatApiKey" type="password" placeholder="AIza…" autocomplete="off">
+
+      <label for="chatModel">Model</label>
+      <select id="chatModel">
+        <option value="gemini-2.0-flash">gemini-2.0-flash (nhanh)</option>
+        <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+        <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+      </select>
+
+      <div class="chat-settings-actions">
+        <button type="button" class="rev-btn primary" id="chatSaveKey">Lưu</button>
+        <button type="button" class="rev-btn" id="chatRemoveKey">Xoá khóa</button>
+        <button type="button" class="rev-btn" id="chatCancelSettings">Đóng</button>
+      </div>
+      <div class="chat-settings-note">
+        Lấy khóa tại aistudio.google.com/apikey. Không bật thì trợ lý vẫn hoạt động ở chế độ ngoại tuyến.
+      </div>
+    </div>
+  </div>
+</section>
+
+<script type="module" src="diemdanh.js"></script>
+</body>
+</html>

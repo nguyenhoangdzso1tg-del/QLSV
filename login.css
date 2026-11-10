@@ -1,0 +1,324 @@
+/* =========================================================
+   TRANG ĐĂNG NHẬP GOOGLE
+   ========================================================= */
+:root {
+  --login-bg-1: #1e3a8a;
+  --login-bg-2: #312e81;
+  --login-bg-3: #0f172a;
+  --login-card: #ffffff;
+  --login-text: #0f172a;
+  --login-muted: #64748b;
+  --login-border: #e2e8f0;
+  --login-input: #f8fafc;
+}
+
+html[data-theme="dark"] {
+  --login-bg-1: #0b1220;
+  --login-bg-2: #111c2e;
+  --login-bg-3: #020617;
+  --login-card: #111c2e;
+  --login-text: #e5edf7;
+  --login-muted: #94a3b8;
+  --login-border: #25324a;
+  --login-input: #0f1a2b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(circle at 15% 10%, #3b82f6 0%, transparent 42%),
+    radial-gradient(circle at 85% 85%, #8b5cf6 0%, transparent 40%),
+    linear-gradient(135deg, var(--login-bg-1), var(--login-bg-2) 55%, var(--login-bg-3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: var(--login-text);
+}
+
+.auth-shell {
+  width: 100%;
+  max-width: 440px;
+}
+
+.login-container {
+  width: 100%;
+  background: var(--login-card);
+  border: 1px solid var(--login-border);
+  padding: 34px 30px 28px;
+  border-radius: 20px;
+  box-shadow: 0 25px 70px rgba(2, 6, 23, 0.4);
+  text-align: center;
+  animation: popIn 0.35s ease both;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.brand {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #4f46e5 60%, #7c3aed);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+}
+
+.login-container h1 {
+  margin: 0 0 8px;
+  font-size: 21px;
+  line-height: 1.3;
+  color: var(--login-text);
+}
+
+.sub {
+  color: var(--login-muted);
+  font-size: 14px;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1.5px solid var(--login-border);
+  background: #ffffff;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="dark"] .google-btn {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.google-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
+}
+
+.google-btn:active {
+  transform: translateY(0);
+}
+
+.google-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.google-btn svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.note {
+  margin: 16px 0 0;
+  color: var(--login-muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.note b {
+  color: var(--login-text);
+}
+
+.msg {
+  margin-top: 14px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  min-height: 0;
+}
+
+.msg.error {
+  color: #fecaca;
+  background: rgba(220, 38, 38, 0.18);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.msg.success {
+  color: #bbf7d0;
+  background: rgba(22, 163, 74, 0.18);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.credit {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  margin: 16px 0 0;
+  user-select: none;
+}
+
+/* ---------- Trạng thái chờ duyệt ---------- */
+.hidden {
+  display: none !important;
+}
+
+.pending-avatar {
+  width: 84px;
+  height: 84px;
+  margin: 4px auto 14px;
+  border-radius: 9999px;
+  padding: 3px;
+  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+}
+
+.pending-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 3px solid var(--login-card);
+  background: var(--login-input);
+}
+
+#pendingName {
+  margin: 0 0 4px;
+  font-size: 17px;
+  color: var(--login-text);
+}
+
+#pendingEmail {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--login-muted);
+  word-break: break-all;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.status-pill.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-pill.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-pill.approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+html[data-theme="dark"] .status-pill.pending {
+  background: #3a2a0d;
+  color: #fcd34d;
+}
+html[data-theme="dark"] .status-pill.rejected {
+  background: #3a1418;
+  color: #fca5a5;
+}
+html[data-theme="dark"] .status-pill.approved {
+  background: #10231a;
+  color: #86efac;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.row button {
+  flex: 1;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.row button:hover {
+  background: #1d4ed8;
+}
+
+.row button.ghost {
+  background: transparent;
+  border: 1.5px solid var(--login-border);
+  color: var(--login-text);
+}
+
+.row button.ghost:hover {
+  background: var(--login-input);
+}
+
+/* ---------- Nút đổi sáng/tối ---------- */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+@media (max-width: 420px) {
+  .login-container {
+    padding: 28px 20px 22px;
+    border-radius: 16px;
+  }
+  .row {
+    flex-direction: column;
+  }
+}

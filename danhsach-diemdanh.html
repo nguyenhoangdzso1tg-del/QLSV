@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh sách điểm danh</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e40af">
+  <link rel="stylesheet" href="theme.css">
+  <script src="theme-init.js"></script>
+
+  <style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background: #f1f5f9;
+    margin: 0;
+    padding: 30px;
+  }
+
+  h2 {
+    text-align: center;
+    color: #48556a;
+    margin-bottom: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: clip; /* clip giữ bo góc, KHÔNG tạo vùng cuộn -> sticky vẫn chạy */
+    box-shadow: 0 10px 25px rgba(73, 68, 68, 0.859);
+  }
+
+  thead {
+    background: #22419e;
+    color: white;
+  }
+  th, td {
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  /* Header dính phía trên khi cuộn danh sách */
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #22419e;
+    box-shadow: inset 0 -2px 0 rgba(255,255,255,0.25), 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr:hover { background: #e0f2fe; transition: 0.2s; }
+
+  .btn-delete {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .btn-delete:hover { background: #dc2626; }
+
+  .empty {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+  }
+
+  .filter-box {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .filter-box .left {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  #filterDate,
+  #filterLop,
+  #filterStatus {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    min-height: 42px;
+    box-sizing: border-box;
+  }
+  #filterLop,
+  #filterStatus { min-width: 180px; }
+
+  .filter-btn {
+    margin-top: 0;
+    background: #2858c7;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .filter-btn:hover { background: #2a41b1; }
+
+  .filter-btn.gray { background: #245ca6; }
+  .filter-btn.gray:hover { background: #204983; }
+
+  /* ===== Thống kê nhanh ===== */
+  .summary-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .sum-chip {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: #334155;
+    box-shadow: 0 2px 6px rgba(0,0,0,.05);
+  }
+  .sum-chip b { font-size: 17px; margin-left: 4px; }
+
+  /* ===== Nhãn trạng thái ===== */
+  .badge {
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .badge.kv { background: #dcfce7; color: #166534; }
+  .badge.cp { background: #fef9c3; color: #854d0e; }
+  .badge.kp { background: #fee2e2; color: #991b1b; }
+
+  @media (max-width: 768px) {
+    body { padding: 14px; }
+    h2 { font-size: 19px; }
+    #filterDate,
+    #filterLop,
+    #filterBuoi,
+    #filterStatus { width: 100%; min-width: 0; }
+    .filter-box .left { width: 100%; }
+    .filter-btn { flex: 1; }
+    th, td { padding: 9px 5px; font-size: 12.5px; }
+    .sum-chip { padding: 7px 10px; font-size: 12px; }
+    .sum-chip b { font-size: 14px; }
+    .badge { font-size: 11px; padding: 3px 7px; }
+  }
+
+  .cell-ten { text-align: left; font-weight: 600; }
+
+  /* ===== Thanh trên cùng (quay lại / hồ sơ / quản trị) ===== */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .topbar .btn { margin-bottom: 0 !important; }
+  .topbar-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .top-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .top-link:hover { background: #eff6ff; }
+  html[data-theme="dark"] .top-link {
+    background: #111c2e !important;
+    border-color: #25324a !important;
+    color: #e5edf7 !important;
+  }
+  html[data-theme="dark"] .top-link:hover { background: #16243a !important; }
+
+  /* Dòng phụ (lớp · khóa) chỉ hiện trên điện thoại */
+  .lop-sub {
+    display: none;
+    font-weight: 500;
+    font-size: 10.5px;
+    color: #64748b;
+    margin-top: 2px;
+    line-height: 1.2;
+  }
+
+  /* ===== Điện thoại: bảng gọn, không tràn ngang ===== */
+  @media (max-width: 640px) {
+    table { table-layout: fixed; }
+
+    /* Ẩn: STT, Lớp, Khóa, Khoa, Người nhập */
+    th:nth-child(1), td:nth-child(1),
+    th:nth-child(4), td:nth-child(4),
+    th:nth-child(5), td:nth-child(5),
+    th:nth-child(6), td:nth-child(6),
+    th:nth-child(10), td:nth-child(10) {
+      display: none;
+    }
+
+    th:nth-child(2), td:nth-child(2) { width: 70px; }
+    th:nth-child(7), td:nth-child(7) { width: 62px; }
+    th:nth-child(8), td:nth-child(8) { width: 42px; }
+    th:nth-child(9), td:nth-child(9) { width: 60px; }
+    th:nth-child(11), td:nth-child(11) { width: 28px; }
+
+    th, td { word-break: break-word; padding: 8px 4px; }
+    .cell-ma { font-size: 10.5px; word-break: break-all; }
+    .cell-ten { font-size: 12px; }
+    .lop-sub { display: block; }
+    .btn-delete { padding: 5px 7px; }
+    #pagination button, #paginationTop button { padding: 8px 11px; }
+  }
+  </style>
+</head>
+
+<body>
+<div class="topbar">
+  <a href="diemdanh.html" class="btn">
+    <i class="fa-solid fa-arrow-left"></i> Quay lại điểm danh
+  </a>
+  <div class="topbar-right">
+    <a href="profile.html" class="top-link">
+      <i class="fa-solid fa-user"></i> Hồ sơ
+    </a>
+    <a href="admin.html" class="top-link" data-admin-only style="display:none;">
+      <i class="fa-solid fa-users-gear"></i> Quản trị
+    </a>
+  </div>
+</div>
+
+<h2>Danh sách điểm danh — <span id="cosoTitle" style="color:#2563eb;">…</span></h2>
+<p style="text-align:center;color:#64748b;font-size:13px;margin:-10px 0 18px;">
+  Chỉ hiển thị các bạn <b>vắng</b> (có phép / không phép). Bạn không vắng không gửi lên đây.
+</p>
+
+<div class="filter-box">
+  <div class="left">
+    <input type="date" id="filterDate" title="Lọc theo ngày điểm danh">
+    <select id="filterLop" title="Lọc theo lớp">
+      <option value="">Tất cả lớp</option>
+    </select>
+    <select id="filterBuoi" title="Lọc theo buổi">
+      <option value="">Tất cả buổi</option>
+      <option value="sang">Sáng</option>
+      <option value="chieu">Chiều</option>
+    </select>
+    <select id="filterStatus" title="Lọc theo trạng thái">
+      <option value="">Tất cả trạng thái</option>
+      <option value="vang_co_phep">Vắng có phép</option>
+      <option value="vang_khong_phep">Vắng không phép</option>
+    </select>
+    <button class="filter-btn" id="btnFilter">Lọc</button>
+    <button class="filter-btn gray" id="btnClear">Tất cả</button>
+    <button class="filter-btn gray" id="btnLoadAll" title="Đọc toàn bộ điểm danh của cơ sở (tốn nhiều lượt đọc)">
+      <i class="fa-solid fa-database"></i> Tải tất cả ngày
+    </button>
+    <button class="filter-btn" id="btnExport" style="background:#059669;">
+      <i class="fa-solid fa-file-excel"></i> Xuất Excel
+    </button>
+  </div>
+  <div id="paginationTop"></div>
+</div>
+
+<div class="summary-row">
+  <span class="sum-chip">Tổng vắng: <b id="sumTotal">0</b></span>
+  <span class="sum-chip" style="color:#a16207">Vắng có phép: <b id="sumCP">0</b></span>
+  <span class="sum-chip" style="color:#b91c1c">Vắng không phép: <b id="sumKP">0</b></span>
+</div>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>STT</th>
+      <th>Mã SV</th>
+      <th>Họ tên</th>
+      <th>Lớp</th>
+      <th>Khóa</th>
+      <th>Khoa</th>
+      <th>Ngày</th>
+      <th>Buổi</th>
+      <th>Trạng thái</th>
+      <th>Người nhập</th>
+      <th>Xóa</th>
+    </tr>
+  </thead>
+  <tbody id="list"></tbody>
+</table>
+
+<div id="pagination" style="margin-top:20px; text-align:right;"></div>
+
+<link rel="stylesheet" href="style.css">
+<script type="module" src="diemdanh-list.js"></script>
+</body>
+</html>
